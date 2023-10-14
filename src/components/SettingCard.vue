@@ -42,12 +42,12 @@
       </q-card-section>
     </q-card-section>
 
-    <q-card-sections>
+    <q-card-section class="no-padding">
       <q-banner rounded class="bg-primary text-white">
         <q-icon name="fas fa-info-circle" class="q-mr-sm" />
         nombre de solutions en brut force: {{ 2 ** gnomeSize }}
       </q-banner>
-    </q-card-sections>
+    </q-card-section>
   </q-card>
 </template>
 

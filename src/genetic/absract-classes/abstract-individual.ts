@@ -1,6 +1,5 @@
 export interface iSettingsAbstractIndividual {
-  generation: number;
-  indexPopulation: number;
+  name: string;
   gnome: any[];
 }
 
@@ -8,15 +7,10 @@ export abstract class AbstractIndividual {
   gnome: any[] = [];
   name: string = "";
   score: number = 0;
-  constructor({
-    generation,
-    indexPopulation,
-    gnome,
-  }: iSettingsAbstractIndividual) {
-    this.name = `${generation}-${indexPopulation}`;
+  constructor({ name, gnome }: iSettingsAbstractIndividual) {
+    this.name = name;
     this.gnome = gnome;
-    this.calcScore();
   }
 
-  abstract calcScore(): void;
+  abstract getScore(): number;
 }

@@ -1,23 +1,43 @@
 <template>
   <SettingCard @change="onChangeSettings" />
-  <q-card class="q-ma-sm" bordered flat>
-    <q-card-actions>
-      <q-btn flat color="primary" @click="onClickStart">
-        Start gen {{ gen }}
-      </q-btn>
-    </q-card-actions>
-    <q-card-section>
-      <q-list>
-        <q-item v-for="el in results" dense>
-          <q-item-section>
-            <q-item-label>{{ el.name }}</q-item-label>
-            <q-item-label caption>{{ el.gnome }}</q-item-label>
-          </q-item-section>
+  <q-card class="q-ma-sm" bordered flat dark>
+    <q-card-section horizontal>
+      <q-card-section class="col">
+        <q-card-actions>
+          <q-btn flat color="primary" @click="onClickStart">
+            RUN BRUT FORCE
+          </q-btn>
+        </q-card-actions>
 
-          <q-item-section side top>
-            <q-badge color="teal" :label="el.score" />
-          </q-item-section> </q-item
-      ></q-list>
+        <q-card-section>
+          <q-banner dark>RESULTAT DU BRUT FORCE + TIMER</q-banner>
+          <q-banner dark>pourcentage de chargement du brut force</q-banner>
+        </q-card-section>
+      </q-card-section>
+
+      <q-separator vertical inset color="white" />
+
+      <q-card-section class="col"
+        ><q-card-actions>
+          <q-btn flat color="primary" @click="onClickStart">
+            Start gen {{ gen }}
+          </q-btn>
+        </q-card-actions>
+        <q-card-section>
+          <q-list>
+            <q-item v-for="el in results" dense>
+              <q-item-section>
+                <q-item-label>{{ el.name }}</q-item-label>
+                <q-item-label caption class="text-white">{{
+                  el.gnome
+                }}</q-item-label>
+              </q-item-section>
+
+              <q-item-section side top>
+                <q-badge color="teal" :label="el.score" />
+              </q-item-section> </q-item
+          ></q-list> </q-card-section
+      ></q-card-section>
     </q-card-section>
   </q-card>
 </template>
@@ -31,7 +51,10 @@ import { reactive, ref } from "vue";
 
 const binarySettings = ref<iSettingBinary>({ population: 10, gnomeSize: 10 });
 
-let binaryOperatorGenetic: BinaryChainOperation;
+let binaryOperatorGenetic: BinaryChainOperation = new BinaryChainOperation({
+  gnomeLength: binarySettings.value.gnomeSize,
+  populationSize: binarySettings.value.population,
+});
 
 const results = ref<
   {
@@ -54,26 +77,16 @@ const onChangeSettings = (settings: iSettingBinary) => {
 };
 
 const onClickStart = () => {
-  if (binaryOperatorGenetic.generation === 0) {
-    binaryOperatorGenetic.initPopulation();
-  } else {
-    binaryOperatorGenetic.archiverGeneration();
-    const selection = binaryOperatorGenetic.selection();
-    const children = binaryOperatorGenetic.crossover(selection);
-    const population = binaryOperatorGenetic.mutation(children);
+  const run = binaryOperatorGenetic.runGeneration();
 
-    binaryOperatorGenetic.population = population;
-  }
-  binaryOperatorGenetic.generation += 1;
-  const sorted = binaryOperatorGenetic.sortPopulation();
-  results.value = sorted.map((el) => {
+  gen.value = run.generation;
+  results.value = run.population.map((p) => {
     return {
-      gnome: el.gnome.join(""),
-      score: el.score,
-      name: el.name,
+      gnome: p.gnome.join(""),
+      name: p.name,
+      score: p.getScore(),
     };
   });
-  gen.value = binaryOperatorGenetic.generation;
 };
 </script>
 

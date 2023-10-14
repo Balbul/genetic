@@ -13,11 +13,12 @@ export class BinaryChainIndividual extends AbstractIndividual {
     super(settings);
   }
 
-  calcScore(): void {
-    let score = 0;
-    this.gnome.forEach((num) => {
-      score += num;
-    });
-    this.score = score;
+  getScore(): number {
+    if (this.score === 0) {
+      this.gnome.forEach((num) => {
+        this.score += num;
+      });
+    }
+    return this.score;
   }
 }

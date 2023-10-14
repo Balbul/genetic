@@ -8,10 +8,6 @@ export abstract class AbstractGeneticOperation {
   populationSize: number = 0;
   population: AbstractIndividual[] = [];
   generation: number = 0;
-  oldGeneration: {
-    generation: number;
-    population: AbstractIndividual[];
-  }[] = [];
 
   constructor(settings: iSettingsAbscratOperation) {
     if (settings.populationSize === 0) {
@@ -20,15 +16,8 @@ export abstract class AbstractGeneticOperation {
     this.populationSize = settings.populationSize;
   }
 
-  archiverGeneration() {
-    this.oldGeneration.push({
-      generation: this.generation,
-      population: this.population,
-    });
-  }
-
   sortPopulation(): AbstractIndividual[] {
-    return this.population.sort((a, b) => b.score - a.score);
+    return this.population.sort((a, b) => b.getScore() - a.getScore());
   }
 
   /**
@@ -61,4 +50,12 @@ export abstract class AbstractGeneticOperation {
    * @param population population qui va subir la mutation
    */
   abstract mutation(population: AbstractIndividual[]): AbstractIndividual[];
+
+  /**
+   * methode utilisée pour lancer une génération
+   */
+  abstract runGeneration(): {
+    population: AbstractIndividual[];
+    generation: number;
+  };
 }

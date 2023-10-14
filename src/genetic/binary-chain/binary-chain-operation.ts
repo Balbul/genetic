@@ -3,6 +3,7 @@ import {
   iSettingsAbscratOperation,
 } from "../absract-classes/abstract-genetic-operation";
 
+import { AbstractIndividual } from "../absract-classes/abstract-individual";
 import { BinaryChainIndividual } from "./binary-chain-individual";
 
 interface iSettingsBinaryOperation extends iSettingsAbscratOperation {
@@ -22,9 +23,8 @@ export class BinaryChainOperation extends AbstractGeneticOperation {
     for (let i = 0; i < this.populationSize; i++) {
       this.population.push(
         new BinaryChainIndividual({
-          generation: this.generation,
+          name: `${this.generation}.${i}`,
           gnome: this.buildGnome(),
-          indexPopulation: i,
         })
       );
     }
@@ -59,17 +59,19 @@ export class BinaryChainOperation extends AbstractGeneticOperation {
       // par rapport à un pivot random
       const point = Math.floor(Math.random() * this.gnomeLength);
       const child = new BinaryChainIndividual({
-        generation: this.generation + 1,
+        name: `${this.generation + 1}.${i}+${parent1.name.split("+")[0]}x${
+          parent2.name.split("+")[0]
+        }`,
         gnome: [
           ...parent1.gnome.slice(0, point),
           ...parent2.gnome.slice(point, this.gnomeLength),
         ],
-        indexPopulation: i,
       });
       newPopulation.push(child);
     }
     return newPopulation;
   }
+
   mutation(population: BinaryChainIndividual[]): BinaryChainIndividual[] {
     // on choisi de ne pas muter le meilleur de la dernière génération
     const mutatedPopulation = [population[0]];
@@ -83,13 +85,29 @@ export class BinaryChainOperation extends AbstractGeneticOperation {
 
         const randomIndex = Math.floor(Math.random() * this.gnomeLength);
         muted.gnome[randomIndex] = muted.gnome[randomIndex] === 0 ? 1 : 0;
-
-        muted.calcScore();
+        muted.name = "M" + muted.name;
         mutatedPopulation.push(muted);
       } else {
         mutatedPopulation.push(population[i]);
       }
     }
     return mutatedPopulation;
+  }
+
+  runGeneration(): { population: BinaryChainIndividual[]; generation: number } {
+    if (this.generation === 0) {
+      this.initPopulation();
+    } else {
+      const selection = this.selection();
+      const children = this.crossover(selection);
+      const newPopulation = this.mutation(children);
+
+      this.population = newPopulation;
+    }
+    this.generation += 1;
+    return {
+      generation: this.generation,
+      population: this.sortPopulation(),
+    };
   }
 }
